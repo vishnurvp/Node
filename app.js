@@ -1,6 +1,9 @@
 const http = require('http');
 const fs = require('fs');
 
+
+let mes = '';
+
 const server = http.createServer((request, response) => {
   const url = request.url;
   const method = request.method;
@@ -11,7 +14,7 @@ const server = http.createServer((request, response) => {
     response.write(
     `<body>
     Hello from node js server
-    <h1>Enter your name</h1>
+    <h1>${mes?mes:'Enter your name'}</h1>
     <br/>
     <form action='/message' method='POST'>
     <input type='text' name='name'/>
@@ -23,10 +26,23 @@ const server = http.createServer((request, response) => {
   }
 
   if (url === '/message' && method === 'POST') {
-    fs.writeFileSync('message.txt', 'Dummy');
-    response.statusCode = 302;
-    response.setHeader('Location', '/');
-    return response.end();
+    const body = [];
+    request.on('data', (chunk) => {
+      console.log(chunk);
+      body.push(chunk);
+    });
+    return request.on('end', () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split('=')[1];
+      mes = message;
+      fs.writeFile('message.txt', message, (err)=>{
+        response.statusCode = 302;
+        response.setHeader('Location', '/');
+        return response.end();
+      });
+      // writeFileSync blocks the execution
+      // console.log(parsedBody);
+    });
   }
 
   if (url === '/home') {
@@ -43,7 +59,7 @@ const server = http.createServer((request, response) => {
     response.write('<h1>Welcome to Node js server project</h1>');
     return response.end();
   }
-  
+
 });
 
 server.listen(4000, ()=>{
