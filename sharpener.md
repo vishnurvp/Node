@@ -102,6 +102,5 @@ const d = () => setTimeout(() => {
 const e = () => console.log('e');
 ```
 
-### Task 6
 
 
