@@ -1,8 +1,8 @@
 const http = require('http');
+const express = require('express');
+const app = express();
 
-const routes = require('./routes');
 
-const server = http.createServer(routes);
 
 server.listen(4000, ()=>{
   console.log('vishnuprasad');
